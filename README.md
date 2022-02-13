@@ -1,4 +1,4 @@
-# Trivial CLI app to display some solarmax-smt data
+# Library/CLI app to display some solarmax-smt data
 
 Display some stats about the solarmax SMT. The
 unit needs to be connected to the network.

@@ -2,59 +2,22 @@
 #
 #
 import datetime
+import inspect
 import sys
 import time
 
-from pymodbus.client.sync import ModbusTcpClient
-from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
-from pymodbus.constants import Endian
+import smaxsmt
 
 # FIXME: is there a way to auto-detect this?
-SOLARMAX_IP='192.168.178.117'
+SOLARMAX_IP = "192.168.178.155"
 
-
-class Reg:
-    def __init__(self, name, reg, postfix="", scale=1.0):
-        self.name=name
-        self.postfix=postfix
-        self.scale=scale
-        if not "/" in reg:
-            reg += "/1"
-        l=reg.split("/",maxsplit=2)
-        self.reg = int(l[0])
-        self.count = int(l[1])
-    def output(self, mc):
-        reg=mc.read_holding_registers(self.reg, count=self.count, unit=1)
-        if len(reg.registers) == 1:
-            val = reg.registers[0]
-        elif len(reg.registers) == 2:
-            val = reg.registers[0]*65535 + reg.registers[1]
-        else:
-            raise Exception("unknown register {}".format(reg))
-        print("{}: {:2.2f} {}".format(self.name,  val/self.scale, self.postfix))
-
-all_regs = [
-    Reg("Current power", "4151/2", "kW", scale=10000),
-    Reg("Max power today", "4155/2", "kW", scale=10000),
-    Reg("Total power today", "4133/2", "kW"),
-    Reg("Total power", "4129/2", "kW"),
-    Reg("Internal converter temperature", "4124/1", "°C"),
-    Reg("Voltage 1", "4112", "V", scale=10.0),
-    Reg("Current 1", "4113", "A", scale=100.0),
-    Reg("Power 1", "4115", "kW", scale=10000.0),
-    Reg("Voltage 2", "4116", "V", scale=10.0),
-    Reg("Current 2", "4117", "A", scale=100.0),
-    Reg("Power 2", "4119", "kW", scale=10000.0),
-]
 
 if __name__ == "__main__":
-    mc = ModbusTcpClient(host=SOLARMAX_IP)
-    res=mc.connect()
-    if res != True:
-        print("cannot connect")
-        sys.exit(1)
-
-    for reg in all_regs:
-        reg.output(mc)
-        
-    mc.close()
+    smax = smaxsmt.SolarmaxSmt(host=SOLARMAX_IP)
+    # sorting is messed up, do something smater
+    for name in dir(smax):
+        if name.startswith("_"):
+            continue
+        attr = inspect.getattr_static(smax, name)
+        if isinstance(attr, property):
+            print(getattr(smax, name))

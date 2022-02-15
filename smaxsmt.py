@@ -84,7 +84,7 @@ class SolarmaxSmt:
     # XXX: improve API
     @property
     def voltage_1(self):
-        reg = _Reg("Internal converter temperature", "4124/1", "°C")
+        reg = (_Reg("Voltage 1", "4112", "V", scale=10.0),)
         return self._get(reg)
 
     @property

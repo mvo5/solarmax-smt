@@ -43,6 +43,13 @@ class ModbusConnectionError(Exception):
     pass
 
 
+# some ideas from https://forum.fhem.de/index.php?topic=122419.0
+# real vendor: Senergy
+# possible other things to poke at:
+# 6912/5 vendor
+# 6672/8 software version
+# 4125 - status
+# 4131 - hours total
 class SolarmaxSmt:
     def __init__(self, host):
         self._host = host

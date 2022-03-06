@@ -14,6 +14,8 @@ SOLARMAX_IP = "192.168.178.155"
 
 if __name__ == "__main__":
     smax = smaxsmt.SolarmaxSmt(host=SOLARMAX_IP)
+    print(smax.current_power)
+    sys.exit(0)
     # sorting is messed up, do something smater
     for name in dir(smax):
         if name.startswith("_"):

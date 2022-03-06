@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #
-from pymodbus.client.sync import ModbusTcpClient
+from pyModbusTCP.client import ModbusClient
 
 
 class _Reg:
@@ -16,11 +16,11 @@ class _Reg:
         self.count = int(li[1])
 
     def output(self, mc):
-        reg = mc.read_holding_registers(self.reg, count=self.count, unit=1)
-        if len(reg.registers) == 1:
-            val = reg.registers[0]
-        elif len(reg.registers) == 2:
-            val = reg.registers[0] * 65535 + reg.registers[1]
+        reg = mc.read_holding_registers(self.reg, self.count)
+        if len(reg) == 1:
+            val = reg[0]
+        elif len(reg) == 2:
+            val = reg[0] * 65535 + reg[1]
         else:
             raise Exception("unknown register {}".format(reg))
         return RegValue(val / self.scale, self.name, self.postfix)
@@ -48,12 +48,8 @@ class SolarmaxSmt:
         self._host = host
 
     def _get(self, reg):
-        mc = ModbusTcpClient(self._host)
-        res = mc.connect()
-        if not res:
-            raise ModbusConnectionError("cannot connect to {}".format(self._host))
+        mc = ModbusClient(host=self._host, auto_open=True)
         val = reg.output(mc)
-        mc.close()
         return val
 
     @property

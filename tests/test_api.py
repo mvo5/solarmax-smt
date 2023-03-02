@@ -4,7 +4,13 @@ import unittest
 
 from unittest.mock import patch
 
-from pymodbus.client.sync import ModbusTcpClient
+try:
+    # pymodbus 3.x
+    from pymodbus.client import ModbusTcpClient
+except ImportError:
+    # pymodbus 2.5.3
+    from pymodbus.client.sync import ModbusTcpClient
+
 
 import smaxsmt
 

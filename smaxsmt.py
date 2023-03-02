@@ -27,24 +27,49 @@ class _Reg:
 
 
 class RegValue(float):
+    """
+    RegValue hold the result of a modbus register
+    """
+
     def __new__(cls, value, name, postfix):
         return super().__new__(cls, value)
 
     def __init__(self, value, name, unit):
-        self.value = value
-        self.name = name
-        self.unit = unit
+        self._value = value
+        self._name = name
+        self._unit = unit
+
+    @property
+    def name(self):
+        """ Name of the register"""
+        return self._name
+
+    @property
+    def value(self):
+        """Value of the register"""
+        return self._value
+
+    @property
+    def unit(self):
+        """Unit of the register (e.g. kW)"""
+        return self._unit
 
     def __str__(self):
         return "{}: {:2.2f} {}".format(self.name, self.value, self.unit)
 
 
 class ModbusConnectionError(Exception):
-    pass
+    """
+    ModbusConnectionError is returned if the connection to the modbus client
+    failed
+    """
 
 
 class SolarmaxSmt:
     def __init__(self, host):
+        """
+        Create a new SolarmaxSmt client on the given "host" IP or name
+        """
         self._host = host
 
     def _get(self, reg):
@@ -58,33 +83,38 @@ class SolarmaxSmt:
 
     @property
     def current_power(self):
+        """Return the current power in kW"""
         reg = _Reg("Current power", "4151/2", "kW", scale=10000)
         return self._get(reg)
 
     @property
     def max_power_today(self):
+        """Return todays maximum power in kW"""
         reg = _Reg("Max power today", "4155/2", "kW", scale=10000)
         return self._get(reg)
 
     @property
     def total_power_today(self):
+        """Return todays total power in kW"""
         reg = _Reg("Total power today", "4133/2", "kW")
         return self._get(reg)
 
     @property
     def total_power(self):
+        """Return accumulated total power in kW s"""
         reg = _Reg("Total power", "4129/2", "kW")
         return self._get(reg)
 
     @property
     def converter_temperature(self):
+        """Return the current internal converter temperature"""
         reg = _Reg("Internal converter temperature", "4124/1", "°C")
         return self._get(reg)
 
     # XXX: improve API
     @property
     def voltage_1(self):
-        reg = _Reg("Internal converter temperature", "4124/1", "°C")
+        reg = _Reg("Voltage 1", "4112", "V")
         return self._get(reg)
 
     @property

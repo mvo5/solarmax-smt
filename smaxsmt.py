@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 #
 #
-from pymodbus.client.sync import ModbusTcpClient
+try:
+    # pymodbus 3.x
+    from pymodbus.client import ModbusTcpClient
+except ImportError:
+    # pymodbus 2.5.3
+    from pymodbus.client.sync import ModbusTcpClient
 
 
 class _Reg:
@@ -41,7 +46,7 @@ class RegValue(float):
 
     @property
     def name(self):
-        """ Name of the register"""
+        """Name of the register"""
         return self._name
 
     @property
